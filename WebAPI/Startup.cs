@@ -10,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using WebAPI.Models;
+using WebAPI.Services;
 
 namespace WebAPI
 {
@@ -25,6 +28,11 @@ namespace WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<InteractDatabaseSettings>(
+                Configuration.GetSection(nameof(InteractDatabaseSettings)));
+
+            services.AddSingleton<IInteractDatabaseSettings>(sp => sp.GetRequiredService<IOptions<InteractDatabaseSettings>>().Value);
+            services.AddSingleton<TopicService>();
             services.AddControllers();
         }
 
