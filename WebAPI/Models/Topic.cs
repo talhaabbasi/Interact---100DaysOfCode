@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace WebAPI.Models
         public string TopicId { get; set; }
 
         [BsonElement("Name")]
+        [JsonProperty("Name")]
         public string TopicName { get; set; }
 
         public int Viewers { get; set; }
