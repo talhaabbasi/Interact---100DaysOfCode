@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using WebAPI.Models;
 using WebAPI.Options;
 using WebAPI.Services;
@@ -35,7 +38,31 @@ namespace WebAPI
             services.AddSingleton<IInteractDatabaseSettings>(sp => sp.GetRequiredService<IOptions<InteractDatabaseSettings>>().Value);
             services.AddSingleton<TopicService>();
             services.AddControllers().AddNewtonsoftJson(options => options.UseMemberCasing());
-            services.AddSwaggerGen(x => { x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Interact API", Version = "v1" }); });
+            services.AddSwaggerGen(x =>
+            {
+                x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Interact API", Version = "v1" });
+            });
+            var jwtOptions = new JwtOptions();
+            Configuration.Bind(key: nameof(jwtOptions), jwtOptions);
+            services.AddSingleton(jwtOptions);
+            services.AddAuthentication(configureOptions: x =>
+             {
+                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+             }).AddJwtBearer(x =>
+             {
+                 x.SaveToken = true;
+                 x.TokenValidationParameters = new TokenValidationParameters
+                 {
+                     ValidateIssuerSigningKey = true,
+                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions.Secret)),
+                     ValidateIssuer = false,
+                     ValidateAudience = false,
+                     RequireExpirationTime = false,
+                     ValidateLifetime = true
+                 };
+             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,6 +89,8 @@ namespace WebAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
