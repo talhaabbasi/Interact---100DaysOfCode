@@ -32,6 +32,13 @@ namespace WebAPI
             {
                 x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Interact API", Version = "v1" });
             });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("Paid", builder =>
+                {
+                    builder.WithOrigins("http://localhost:5000");
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +65,7 @@ namespace WebAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthentication();
 

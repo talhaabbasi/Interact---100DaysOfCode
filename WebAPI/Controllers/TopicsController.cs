@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models;
 using WebAPI.Services;
@@ -19,10 +20,12 @@ namespace WebAPI.Controllers
             _topicService = topicService;
         }
 
+        [EnableCors]
         [HttpGet]
         public ActionResult<List<Topic>> Get() =>
             _topicService.Get();
 
+        [EnableCors("Paid")]
         [HttpGet("{id:length(24)}", Name = "GetTopic")]
         public ActionResult<Topic> Get(string id)
         {
