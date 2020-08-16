@@ -11,6 +11,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("FreePolicy")]
     public class TopicsController : ControllerBase
     {
         private readonly TopicService _topicService;
@@ -20,12 +21,10 @@ namespace WebAPI.Controllers
             _topicService = topicService;
         }
 
-        [EnableCors]
         [HttpGet]
         public ActionResult<List<Topic>> Get() =>
             _topicService.Get();
 
-        [EnableCors("Paid")]
         [HttpGet("{id:length(24)}", Name = "GetTopic")]
         public ActionResult<Topic> Get(string id)
         {

@@ -34,9 +34,11 @@ namespace WebAPI
             });
             services.AddCors(options =>
             {
-                options.AddPolicy("Paid", builder =>
+                options.AddPolicy("FreePolicy", builder =>
                 {
-                    builder.WithOrigins("http://localhost:5000");
+                    builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
                 });
             });
         }
@@ -65,7 +67,7 @@ namespace WebAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors();
+            app.UseCors("FreePolicy");
 
             app.UseAuthentication();
 
